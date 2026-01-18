@@ -6,6 +6,9 @@ pipeline {
         NEXUS_URL = "http://localhost:8081/repository/maven-releases/"
         NEXUS_REPO_ID = "nexus"
     }
+    tools {
+        maven 'M3'
+    }
 
     stages {
         stage('Checkout') {
