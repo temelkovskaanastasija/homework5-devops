@@ -20,7 +20,7 @@ pipeline {
         stage('Build') {
             steps {
 
-                bat 'mvn clean package'
+                sh 'mvn clean package'
             }
         }
 
@@ -34,7 +34,7 @@ pipeline {
         stage('Deploy to Nexus') {
             steps {
 
-                bat """
+                sh """
                 mvn deploy -DskipTests \
                 -DaltDeploymentRepository=${NEXUS_REPO_ID}::default::${NEXUS_URL}
                 """
