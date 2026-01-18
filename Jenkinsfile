@@ -34,14 +34,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to Nexus') {
-            steps {
-
-                sh """
-                mvn deploy -DskipTests \
-                -DaltDeploymentRepository=${NEXUS_REPO_ID}::default::${NEXUS_URL}
-                """
-            }
+ 
         }
     }
 }
