@@ -4,17 +4,13 @@ pipeline {
   }
 
   stages {
-    stage('Clean') { steps { deleteDir() } }
+    stage('Clean') {
+      steps { deleteDir() }
+    }
 
     stage('Prep') {
       steps {
-        sh 'git config --global --add safe.directory /var/jenkins_home/workspace/*'
-      }
-    }
-
-    stage('Checkout') {
-      steps {
-        checkout scm
+        sh 'git config --global --add safe.directory /var/jenkins_home/workspace/* || true'
       }
     }
 
