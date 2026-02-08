@@ -1,13 +1,7 @@
 pipeline {
-  agent {
-    docker { image 'maven:3.9.6-eclipse-temurin-21' }
-  }
+  agent { docker { image 'maven:3.9.6-eclipse-temurin-21' } }
 
   stages {
-    stage('Clean') {
-      steps { deleteDir() }
-    }
-
     stage('Prep') {
       steps {
         sh 'git config --global --add safe.directory /var/jenkins_home/workspace/* || true'
@@ -15,9 +9,7 @@ pipeline {
     }
 
     stage('Build & Test') {
-      steps {
-        sh 'mvn clean test'
-      }
+      steps { sh 'mvn clean test' }
     }
 
     stage('Deploy SNAPSHOT to Nexus') {
