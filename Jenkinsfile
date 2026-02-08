@@ -14,7 +14,7 @@ pipeline {
         stage('Checkout') {
             steps {
 
-                git url: 'http://host.docker.internal:3000/anastasijatemelkovska/homework-two.git',
+                git url: 'http://host.docker.internal:3000/anastasijatemelkovska/Devops_Homework.git',
                  branch: 'master',
                   credentialsId: 'gitea-creds'
             }
