@@ -1,40 +1,48 @@
 pipeline {
-    agent any
+  agent {
+    docker { image 'maven:3.9.6-eclipse-temurin-21' }
+  }
 
-    environment {
+  stages {
+    stage('Clean') { steps { deleteDir() } }
 
-        NEXUS_URL = "http://localhost:8081/repository/maven-releases/"
-        NEXUS_REPO_ID = "nexus"
+    stage('Prep') {
+      steps {
+        sh 'git config --global --add safe.directory /var/jenkins_home/workspace/*'
+      }
     }
-    tools {
-        maven 'M3'
+
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-
-                git url: 'http://host.docker.internal:3000/anastasijatemelkovska/Devops_Homework.git',
-                 branch: 'master',
-                  credentialsId: 'gitea-creds'
-            }
-        }
-
-        stage('Build') {
-            steps {
-
-                sh 'mvn clean package'
-            }
-        }
-
-        stage('Archive') {
-            steps {
-
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-            }
-        }
-
-
-
+    stage('Build & Test') {
+      steps {
+        sh 'mvn clean test'
+      }
     }
+
+    stage('Deploy SNAPSHOT to Nexus') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+          sh '''
+            cat > settings.xml <<EOF
+<settings>
+  <servers>
+    <server>
+      <id>nexus-snapshots</id>
+      <username>${NEXUS_USER}</username>
+      <password>${NEXUS_PASS}</password>
+    </server>
+  </servers>
+</settings>
+EOF
+            mvn -s settings.xml deploy
+          '''
+        }
+      }
+    }
+  }
 }
