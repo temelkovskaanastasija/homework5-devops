@@ -58,7 +58,7 @@
         <snapshotRepository>
             <id>nexus-snapshots</id>
             <name>Internal Nexus Snapshots</name>
-            <url>http://nexus:8081/repository/maven-snapshots/</url>
+            <url>http://host.docker.internal:8081/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
