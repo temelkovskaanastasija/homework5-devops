@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
 
-if grep -q "app-blue" ./nginx/active_upstream.conf; then
-  cp ./nginx/upstream_green.conf ./nginx/active_upstream.conf
-  docker exec bg-nginx nginx -s reload
+ACTIVE=$(./scripts/detect_active.sh)
+
+if [ "$ACTIVE" = "blue" ]; then
+  ./scripts/switch_to_green.sh
   echo "Rollback -> GREEN"
 else
-  cp ./nginx/upstream_blue.conf ./nginx/active_upstream.conf
-  docker exec bg-nginx nginx -s reload
+  ./scripts/switch_to_blue.sh
   echo "Rollback -> BLUE"
 fi

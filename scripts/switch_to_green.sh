@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
-cp ./nginx/upstream_green.conf ./nginx/active_upstream.conf
+docker cp ./nginx/upstream_green.conf bg-nginx:/etc/nginx/conf.d/active_upstream.conf
 docker exec bg-nginx nginx -s reload
+
 echo "Switched traffic to GREEN"

@@ -75,13 +75,13 @@ EOF
       }
     }
 
-    stage('Deploy to Inactive Environment') {
-      steps {
-        sh '''
-          APP_VERSION=${IMAGE_TAG} docker compose -f docker-compose.bg.yml up -d app-${TARGET_ENV}
-        '''
-      }
-    }
+stage('Deploy to Inactive Environment') {
+  steps {
+    sh '''
+     APP_VERSION=${IMAGE_TAG} docker-compose -p homework3 -f docker-compose.bg.yml up -d --no-deps --force-recreate app-${TARGET_ENV}
+    '''
+  }
+}
 
     stage('Validate Inactive Environment') {
       steps {

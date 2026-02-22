@@ -1,9 +1,11 @@
 #!/bin/bash
 set -e
 
-if grep -q "app-blue" ./nginx/active_upstream.conf; then
+ACTIVE_CONF=$(docker exec bg-nginx cat /etc/nginx/conf.d/active_upstream.conf)
+
+if echo "$ACTIVE_CONF" | grep -q "app-blue"; then
   echo "blue"
-elif grep -q "app-green" ./nginx/active_upstream.conf; then
+elif echo "$ACTIVE_CONF" | grep -q "app-green"; then
   echo "green"
 else
   echo "unknown"
