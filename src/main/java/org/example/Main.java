@@ -18,7 +18,7 @@ public class Main {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
         server.createContext("/", exchange -> {
-            String response = "DevOps Homework4 v2 - " + env + " version=" + version;
+            String response = "DevOps Homework4 - " + env + " version=" + version;
             sendResponse(exchange, response);
         });
 
