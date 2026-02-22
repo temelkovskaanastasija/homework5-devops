@@ -78,6 +78,7 @@ EOF
 stage('Deploy to Inactive Environment') {
   steps {
     sh '''
+     docker rm -f app-${TARGET_ENV} || true
      APP_VERSION=${IMAGE_TAG} docker-compose -p homework3 -f docker-compose.bg.yml up -d --no-deps --force-recreate app-${TARGET_ENV}
     '''
   }
