@@ -1,0 +1,21 @@
+name: Deploy Prod
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Pull image
+        run: docker pull ghcr.io/${{ github.repository_owner }}/homework5-app:latest
+
+      - name: Deploy
+        run: docker compose -f docker-compose.deploy.yml up -d

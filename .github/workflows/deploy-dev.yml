@@ -1,0 +1,26 @@
+name: Deploy Dev
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Pull docker image
+        run: docker pull ghcr.io/${{ github.repository_owner }}/homework5-app:latest
+
+      - name: Start containers
+        run: |
+          docker compose -f docker-compose.deploy.yml up -d
+
+      - name: Health check
+        run: |
+          sleep 5
+          curl -f http://localhost/health
