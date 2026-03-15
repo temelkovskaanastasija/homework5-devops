@@ -22,6 +22,6 @@ public class IntegrationTest {
         String body = in.readLine();
         in.close();
 
-        assertEquals("{\"status\":true}", body);
+        assertEquals("OK", body);
     }
 }
