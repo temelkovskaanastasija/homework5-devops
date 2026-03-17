@@ -1,38 +1,28 @@
 version: "3.8"
 
 services:
-
-  nginx:
-    image: nginx:latest
-    container_name: bg-nginx
+  frontend:
+    build: ./frontend
+    container_name: frontend
     ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/active_upstream.conf:/etc/nginx/conf.d/active_upstream.conf
+      - "3000:80"
     depends_on:
-      - app-blue
-      - app-green
+      - backend
     networks:
-      - bg-net
+      - app-net
 
-  app-blue:
+  backend:
     image: ghcr.io/temelkovskaanastasija/homework5-app:latest
-    container_name: app-blue
+    container_name: backend
     environment:
-      - APP_ENV=blue
+      - APP_ENV=dev
+      - APP_VERSION=latest
       - PORT=8080
+    ports:
+      - "8080:8080"
     networks:
-      - bg-net
-
-  app-green:
-    image: ghcr.io/temelkovskaanastasija/homework5-app:latest
-    container_name: app-green
-    environment:
-      - APP_ENV=green
-      - PORT=8080
-    networks:
-      - bg-net
+      - app-net
 
 networks:
-  bg-net:
+  app-net:
+    driver: bridge

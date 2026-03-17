@@ -5,22 +5,32 @@ on:
     branches: [develop]
 
 jobs:
-
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/checkout@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull docker image
+      - name: Pull backend image
         run: docker pull ghcr.io/${{ github.repository_owner }}/homework5-app:latest
 
-      - name: Start containers
+      - name: Start frontend and backend
         run: |
-          docker compose -f docker-compose.deploy.yml up -d
+          docker compose -f docker-compose.deploy.yml up -d --build
 
-      - name: Health check
+      - name: Check backend health
         run: |
           sleep 5
-          curl -f http://localhost/health
+          curl -f http://localhost:8080/health
+
+      - name: Check frontend
+        run: |
+          curl -f http://localhost:3000

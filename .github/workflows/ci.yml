@@ -34,18 +34,23 @@ jobs:
         run: mvn -Dtest=HomeworkTest test
 
       - name: Login to GitHub Container Registry
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker image
+      - name: Build backend Docker image
         run: |
           docker build -t $IMAGE_NAME:${{ github.sha }} .
           docker tag $IMAGE_NAME:${{ github.sha }} $IMAGE_NAME:latest
 
-      - name: Run container test
+      - name: Build frontend Docker image
+        run: |
+          docker build -t frontend-test ./frontend
+
+      - name: Run backend container test
         run: |
           docker run -d -p 8080:8080 --name app-test \
             -e APP_ENV=test \
@@ -57,11 +62,11 @@ jobs:
           curl -f http://localhost:8080/health
           curl -f http://localhost:8080/version
 
-      - name: Remove test container
+      - name: Remove backend test container
         if: always()
         run: docker rm -f app-test || true
 
-      - name: Push Docker image
+      - name: Push backend Docker image
         if: github.event_name == 'push'
         run: |
           docker push $IMAGE_NAME:${{ github.sha }}

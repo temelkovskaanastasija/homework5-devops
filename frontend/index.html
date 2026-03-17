@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homework 5 Frontend</title>
+</head>
+<body>
+<h1>Frontend Service</h1>
+<p>This is the frontend of the multi-service application.</p>
+
+<button onclick="checkBackend()">Check Backend Health</button>
+<p id="result">Result will appear here...</p>
+
+<script>
+    async function checkBackend() {
+        try {
+            const response = await fetch("http://localhost:8080/health");
+            const text = await response.text();
+            document.getElementById("result").innerText = "Backend response: " + text;
+        } catch (error) {
+            document.getElementById("result").innerText = "Error calling backend";
+        }
+    }
+</script>
+</body>
+</html>
