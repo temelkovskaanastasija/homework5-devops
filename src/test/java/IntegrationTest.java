@@ -11,7 +11,7 @@ public class IntegrationTest {
 
     @Test
     void applicationStartsSuccessfully() throws Exception {
-        URL url = new URL("http://localhost:8080/health");
+        URL url = new URL("http://localhost:8082/health");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
 

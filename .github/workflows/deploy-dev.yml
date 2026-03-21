@@ -29,7 +29,7 @@ jobs:
       - name: Check backend health
         run: |
           sleep 5
-          curl -f http://localhost:8080/health
+          curl -f http://localhost:8082/health
 
       - name: Check frontend
         run: |
