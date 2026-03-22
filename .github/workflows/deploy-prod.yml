@@ -13,12 +13,6 @@ jobs:
     environment: prod
 
     steps:
-      - name: Checkout main branch
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -27,19 +21,61 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull images
+        shell: powershell
         run: |
           docker pull ghcr.io/${{ github.repository_owner }}/homework5-app:latest
           docker pull ghcr.io/${{ github.repository_owner }}/homework5-frontend:latest
 
-      - name: Start prod environment
+      - name: Create prod compose file
+        shell: powershell
         run: |
-          docker compose -p homework5-prod -f docker-compose.prod.yml down --remove-orphans
-          docker compose -p homework5-prod -f docker-compose.prod.yml up -d
+          @'
+          services:
+            frontend:
+              image: ghcr.io/temelkovskaanastasija/homework5-frontend:latest
+              ports:
+                - "5001:80"
+              depends_on:
+                - backend
+              networks:
+                - app-net
+
+            backend:
+              image: ghcr.io/temelkovskaanastasija/homework5-app:latest
+              environment:
+                - APP_ENV=prod
+                - APP_VERSION=latest
+                - PORT=8080
+              ports:
+                - "8083:8080"
+              networks:
+                - app-net
+
+          networks:
+            app-net:
+              driver: bridge
+          '@ | Set-Content docker-compose.prod.generated.yml
+
+      # 🧪 DEBUG
+      - name: Show generated compose
+        shell: powershell
+        run: |
+          Get-Content docker-compose.prod.generated.yml
+
+      - name: Stop old prod containers
+        shell: powershell
+        run: |
+          docker compose -p homework5-prod -f docker-compose.prod.generated.yml down --remove-orphans
+
+      - name: Start prod environment
+        shell: powershell
+        run: |
+          docker compose -p homework5-prod -f docker-compose.prod.generated.yml up -d
 
       - name: Check backend health
         shell: powershell
         run: |
-          Start-Sleep -Seconds 5
+          Start-Sleep -Seconds 8
           curl http://localhost:8083/health
 
       - name: Check frontend
