@@ -2,7 +2,7 @@ services:
   frontend:
     image: ghcr.io/temelkovskaanastasija/homework5-frontend:latest
     ports:
-      - "3003:80"
+      - "5001:80"
     depends_on:
       - backend
     networks:
