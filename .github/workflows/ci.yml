@@ -7,7 +7,8 @@ on:
     branches: [develop, main]
 
 env:
-  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/homework5-app
+  BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/homework5-app
+  FRONTEND_IMAGE: ghcr.io/${{ github.repository_owner }}/homework5-frontend
 
 jobs:
   build:
@@ -43,12 +44,13 @@ jobs:
 
       - name: Build backend Docker image
         run: |
-          docker build -t $IMAGE_NAME:${{ github.sha }} .
-          docker tag $IMAGE_NAME:${{ github.sha }} $IMAGE_NAME:latest
+          docker build -t $BACKEND_IMAGE:${{ github.sha }} .
+          docker tag $BACKEND_IMAGE:${{ github.sha }} $BACKEND_IMAGE:latest
 
       - name: Build frontend Docker image
         run: |
-          docker build -t frontend-test ./frontend
+          docker build -t $FRONTEND_IMAGE:${{ github.sha }} ./frontend
+          docker tag $FRONTEND_IMAGE:${{ github.sha }} $FRONTEND_IMAGE:latest
 
       - name: Run backend container test
         run: |
@@ -56,7 +58,7 @@ jobs:
             -e APP_ENV=test \
             -e APP_VERSION=${{ github.sha }} \
             -e PORT=8080 \
-            $IMAGE_NAME:${{ github.sha }}
+            $BACKEND_IMAGE:${{ github.sha }}
 
           sleep 8
           curl -f http://localhost:8080/health
@@ -69,5 +71,11 @@ jobs:
       - name: Push backend Docker image
         if: github.event_name == 'push'
         run: |
-          docker push $IMAGE_NAME:${{ github.sha }}
-          docker push $IMAGE_NAME:latest
+          docker push $BACKEND_IMAGE:${{ github.sha }}
+          docker push $BACKEND_IMAGE:latest
+
+      - name: Push frontend Docker image
+        if: github.event_name == 'push'
+        run: |
+          docker push $FRONTEND_IMAGE:${{ github.sha }}
+          docker push $FRONTEND_IMAGE:latest

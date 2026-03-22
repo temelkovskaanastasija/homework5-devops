@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  frontend:
+    image: ghcr.io/temelkovskaanastasija/homework5-frontend:latest
+    ports:
+      - "3003:80"
+    depends_on:
+      - backend
+    networks:
+      - app-net
+
+  backend:
+    image: ghcr.io/temelkovskaanastasija/homework5-app:latest
+    environment:
+      - APP_ENV=prod
+      - APP_VERSION=latest
+      - PORT=8080
+    ports:
+      - "8083:8080"
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
