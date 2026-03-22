@@ -13,6 +13,7 @@ jobs:
     environment: prod
 
     steps:
+      # 🔐 Login GHCR
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -20,19 +21,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # 📦 Pull latest images (важно!)
       - name: Pull images
         shell: powershell
         run: |
           docker pull ghcr.io/${{ github.repository_owner }}/homework5-app:latest
           docker pull ghcr.io/${{ github.repository_owner }}/homework5-frontend:latest
 
+      # 🧱 Генерирај compose (без cache проблем)
       - name: Create prod compose file
         shell: powershell
         run: |
           @'
           services:
             frontend:
-              image: ghcr.io/temelkovskaanastasija/homework5-frontend:latest
+              image: ghcr.io/${{ github.repository_owner }}/homework5-frontend:latest
               ports:
                 - "5001:80"
               depends_on:
@@ -41,7 +44,7 @@ jobs:
                 - app-net
 
             backend:
-              image: ghcr.io/temelkovskaanastasija/homework5-app:latest
+              image: ghcr.io/${{ github.repository_owner }}/homework5-app:latest
               environment:
                 - APP_ENV=prod
                 - APP_VERSION=latest
@@ -56,28 +59,33 @@ jobs:
               driver: bridge
           '@ | Set-Content docker-compose.prod.generated.yml
 
-      # 🧪 DEBUG
+      # 🔍 Debug (да видиш што се стартува)
       - name: Show generated compose
         shell: powershell
         run: |
           Get-Content docker-compose.prod.generated.yml
 
+      # 🛑 Stop старо
       - name: Stop old prod containers
         shell: powershell
         run: |
           docker compose -p homework5-prod -f docker-compose.prod.generated.yml down --remove-orphans
 
+      # 🚀 START (НАЈВАЖНО – force recreate)
       - name: Start prod environment
         shell: powershell
         run: |
-          docker compose -p homework5-prod -f docker-compose.prod.generated.yml up -d
+          docker compose -p homework5-prod -f docker-compose.prod.generated.yml pull
+          docker compose -p homework5-prod -f docker-compose.prod.generated.yml up -d --force-recreate
 
+      # 🩺 Backend check
       - name: Check backend health
         shell: powershell
         run: |
           Start-Sleep -Seconds 8
           curl http://localhost:8083/health
 
+      # 🌐 Frontend check
       - name: Check frontend
         shell: powershell
         run: |
