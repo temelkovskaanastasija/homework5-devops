@@ -35,4 +35,4 @@ jobs:
 
       - name: Check frontend
         run: |
-          curl -f http://localhost:3001
+          curl -f http://localhost:3002
