@@ -24,6 +24,7 @@ jobs:
 
       - name: Start frontend and backend
         run: |
+          docker compose -f docker-compose.deploy.yml down --remove-orphans
           docker compose -f docker-compose.deploy.yml up -d --build
 
       - name: Check backend health
