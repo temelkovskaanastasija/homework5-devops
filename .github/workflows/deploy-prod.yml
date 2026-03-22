@@ -13,10 +13,16 @@ jobs:
     environment: prod
 
     steps:
+      - name: Clean workspace
+        run: |
+          git reset --hard
+          git clean -fd
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
+          clean: true
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
