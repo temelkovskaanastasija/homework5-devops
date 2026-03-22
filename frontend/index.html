@@ -15,7 +15,7 @@
 <script>
     async function checkBackend() {
         try {
-            const response = await fetch("http://localhost:3001/health");
+            const response = await fetch("http://localhost:8083/health");
             const text = await response.text();
             document.getElementById("result").innerText = "Backend response: " + text;
         } catch (error) {
