@@ -12,21 +12,23 @@ jobs:
     runs-on: [self-hosted, Windows, X64, devops]
 
     steps:
-      - name: Clean workspace
+      # 🔥 FORCE CLEAN (за self-hosted runner cache проблем)
+      - name: Force clean workspace
         run: |
-          git reset --hard
-          git clean -fd
+          Remove-Item -Recurse -Force * -ErrorAction SilentlyContinue
 
+      # ✅ CHECKOUT ТОЧЕН COMMIT
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
-          clean: true
 
-      - name: Debug compose file
+      # 🧪 DEBUG (да видиме што чита runner-от)
+      - name: Show compose file
         run: |
           type docker-compose.dev.yml
 
+      # 🔐 LOGIN GHCR
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -34,22 +36,26 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # 📦 PULL IMAGES
       - name: Pull images
         run: |
           docker pull ghcr.io/${{ github.repository_owner }}/homework5-app:latest
           docker pull ghcr.io/${{ github.repository_owner }}/homework5-frontend:latest
 
+      # 🚀 START SERVICES
       - name: Start dev environment
         run: |
           docker compose -p homework5-dev -f docker-compose.dev.yml down --remove-orphans
           docker compose -p homework5-dev -f docker-compose.dev.yml up -d
 
+      # 🩺 BACKEND HEALTH CHECK
       - name: Check backend health
         shell: powershell
         run: |
           Start-Sleep -Seconds 5
           curl http://localhost:8082/health
 
+      # 🌐 FRONTEND CHECK
       - name: Check frontend
         shell: powershell
         run: |
